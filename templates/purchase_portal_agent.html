@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+   <body>
+
+      <h2>Welcome to your ticket purchase portal.</br> search for your flight to purchase</h2>
+      <form action="/agent_search_to_purchase" method="POST">
+        <input type="text" name = "customeremail" placeholder="customer email" required/> </br>
+        <input type="text" name = "airportsource" placeholder="source airport" required/> </br>
+        <input type="text" name = "airportdestination" placeholder="destination airport" required/> </br>
+        <input type="number" name = "flightnumber" placeholder="flight number" required/> </br>
+        <input type="submit" value = enter />
+        {% if error %}
+      		<p class="error"><strong>Error:</strong> {{error}}</p>
+      	{% endif %}
+        {% if success %}
+    			<p class="SUCCESS!!!!"><h3>success, </h3> <h2>{{success}}</h2></p>
+    		{% endif %}
+    	</form>
+
+
+   </body>
+</html>

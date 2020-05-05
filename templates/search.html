@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+<body>
+<form action="/searchFlight" method="get">
+  <input type="submit" value = "Search for upcoming flights"</br>
+	{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+	{% endif %}
+</form>
+<form action="/viewFlights" method="get">
+  <input type="submit" value = "view other flights"</br>
+  {% if error %}
+    <p class="error"><strong>Error:</strong> {{error}}</p>
+  {% endif %}
+</form>
+<a href="/">Go back</a>
+</body>
+</html>

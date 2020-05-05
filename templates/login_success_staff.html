@@ -1,0 +1,21 @@
+<html>
+<head>
+</head>
+<body>
+	<h1>Login Successful!</h1>
+	<h1>Here are the options for the airline staff</h1>
+{% if not message %}
+	<a href="/staff_view_flights">View my flights</a>
+	<a href="/create_flights">Create new flights</a>
+	<a href="/change_status">Change status of flights</a>
+	<a href="/add_airplane">Add airplane in the system</a>
+	<a href="/add_airport">Add new airport in the system</a>
+	<a href="/staff_view_agents">View all the booking agents</a>
+	<a href="/staff_view_cust">View frequent customers</a>
+	<a href="/view_reports">View reports</a>
+	<a href="/rev_comparison">Comparison of Revenue earned</a>
+	<a href="/view_dest">View Top destinations</a>
+	<a href="/logout">Logout</a>
+{% endif %}
+</body>
+</html>

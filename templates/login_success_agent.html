@@ -1,0 +1,16 @@
+<html>
+<head>
+</head>
+<body>
+	<h1>Login Successful!</h1>
+	<h1>Here are the options for the booking agent</h1>
+{% if not message %}
+	<a href="/agent_view_flights">View my flights</a>
+	<a href="/agent_purchase">Purchase tickets</a>
+	<a href="/search_using_info">Search for flights</a>
+	<a href="/agent_view_commission">View my commission</a>
+	<a href="/agent_view_cust">View top customers</a>
+	<a href="/Logout">Logout</a>
+{% endif %}
+</body>
+</html>

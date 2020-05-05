@@ -1,0 +1,27 @@
+<html>
+<head>
+</head>
+<body>
+	<h1>Login Successful!</h1>
+	<h1>Here are the options for the customer</h1>
+	<form action="/customer_view_flights" method="GET">
+		<input type="submit" value = "view flights" />
+	</form>
+	<form action="/customer_purchase" method="GET">
+		<input type="submit" value = "purchase tickets" />
+	</form>
+	<form action="/track_spending" method="GET">
+		<input type="submit" value = "track my spending" />
+	</form>
+	<form action="/search_using_info" method="POST">
+		<input type="submit" value = "search for flights" /></br>
+	  <input type="text" name = "airportsource" placeholder="source city/source airport" required/> </br>
+	  <input type="text" name = "airportdestination" placeholder="destination city/destination airport" required/> </br>
+		{% if error %}
+			<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+		{% endif %}
+	</form>
+<a href="/Logout">Logout</a>
+
+</body>
+</html>
