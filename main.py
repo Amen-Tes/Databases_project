@@ -113,6 +113,40 @@ def agent_search_to_get():
 
 """Airline Staff Cases"""
 '''*********************************************************************************************************************************'''
+@app.route('/staff_view_flights', methods=['GET', 'POST'])
+def search_staff_flight():
+    cursor = conn.cursor()
+    query = 'SELECT flight_num, departure_time, departure_airport, arrival_time, arrival_airport, ticket_id FROM flight natural join ticket'
+    session_key = session.get('username')
+    cursor.execute(query)
+    data = cursor.fetchall()
+    error = None
+    rows = []
+    tuplerow=tuple(rows)
+    count=0
+    dicty={}
+    if data:
+        for i in range(len(data)):
+            var=data[count]
+            dicty[count] = "flight number {},  departs from {},  departure_time {},  arrives to {},  arrival time {},  flight number = {}, ticket_id = {}".format(count + 1,  data[count]['departure_airport'],  data[count]['departure_time'], data[count]['arrival_airport'], data[count]['arrival_time'], data[count]['flight_num'], data[count]['ticket_id'] )
+            count+=1
+            print('\n')
+        return dicty
+
+    else:
+        return "please purchase a ticket first"
+        return render_template("login_success_staff.html")
+
+    return rows
+
+
+
+
+
+
+
+
+
 '''*********************************************************************************************************************************'''
 
 
