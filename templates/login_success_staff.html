@@ -3,19 +3,41 @@
 </head>
 <body>
 	<h1>Login Successful!</h1>
-	<h1>Here are the options for the airline staff</h1>
-{% if not message %}
-	<a href="/staff_view_flights">View my flights</a>
-	<a href="/create_flights">Create new flights</a>
-	<a href="/change_status">Change status of flights</a>
-	<a href="/add_airplane">Add airplane in the system</a>
-	<a href="/add_airport">Add new airport in the system</a>
-	<a href="/staff_view_agents">View all the booking agents</a>
-	<a href="/staff_view_cust">View frequent customers</a>
-	<a href="/view_reports">View reports</a>
-	<a href="/rev_comparison">Comparison of Revenue earned</a>
-	<a href="/view_dest">View Top destinations</a>
-	<a href="/logout">Logout</a>
-{% endif %}
+	<h1>Here are the options for airline staff</h1>
+	<form action="/staff_view_flights" method="GET">
+		<input type="submit" value = "view flights" />
+	</form>
+	<form action="/create_flights" method="GET">
+		<input type="submit" value = "create flights" />
+	</form>
+	<form action="/change_flight_status" method="GET">
+		<input type="submit" value = "change flight status" />
+	</form>
+	<form action="/add_airplane" method="GET">
+		<input type="submit" value = "add airplane" />
+	</form>
+	<form action="/add_airport" method="GET">
+		<input type="submit" value = "add airport" />
+	</form>
+	<form action="/staff_view_agents" method="GET">
+		<input type="submit" value = "view booking agents" />
+	</form>
+	<form action="/staff_view_customers" method="GET">
+		<input type="submit" value = "view frequent customers" />
+	</form>
+	<form action="/staff_view_reports" method="GET">
+		<input type="submit" value = "view reports" />
+	</form>
+	<form action="/revenue_comparison" method="GET">
+		<input type="submit" value = "compare revenues" />
+	</form>
+	<form action="/view_dest" method="GET">
+		<input type="submit" value = "view top destinations" />
+	</form>
+	{% if error %}
+		<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+	{% endif %}
+<a href="/Logout">Logout</a>
+
 </body>
 </html>

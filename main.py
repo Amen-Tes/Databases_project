@@ -7,10 +7,10 @@ app = Flask(__name__)
 
 #Configure MySQL
 conn = pymysql.connect(host='localhost',
-                      # port=8889,
+                        port=8889,
                        user='root',
-                       password='',
-                       db='db3',
+                       password='password',
+                       db='databases_project_part3',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -319,7 +319,7 @@ def search_flight_using_info():
 def logout():
     return render_template('index.html')
 
-"""All customer use case flask files"""
+"""All customer use cases """
 '''*********************************************************************************************************************************'''
 @app.route('/customer_view_flights', methods=['GET', 'POST'])
 def search_customers_flight():
@@ -568,4 +568,4 @@ app.secret_key = 'some key that you will never guess'
 #debug = True -> you don't have to restart flask
 #for changes to go through, TURN OFF FOR PRODUCTION
 if __name__ == "__main__":
-    app.run('127.0.0.1', 5000, debug = True)
+    app.run('127.0.0.1', 8000, debug = True)
