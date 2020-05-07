@@ -141,6 +141,47 @@ def search_staff_flight():
 
 
 
+@app.route('/create_flights', methods=['GET', 'POST'])
+def create_flights():
+    return render_template("airline_staff_createflights.html")
+
+@app.route('/create flights', methods=['GET', 'POST'])
+def creation():
+    airline = request.form['airline_name']
+    flight_num = request.form['flight_num']
+    departure_airport = request.form['departure_airport']
+    departure_time = request.form['departure_time']
+    arrival_airport = request.form['arrival_airport']
+    arrival_time = request.form['arrival_time']
+    price = request.form['price']
+    status = request.form['status']
+    airplane_id = request.form['airplane_id']
+    cursor = conn.cursor()
+    #executes query
+    query = 'SELECT * FROM flight'
+    try:
+        cursor.execute(query)
+        data = cursor.fetchall()
+    except:
+        error = "enter proper info"
+        return render_template('login_success_staff.html', error = error)
+    #stores the results in a variable
+    #use fetchall() if you are expecting more than 1 data row
+    error = None
+    for i in range(len(data)):
+        if data[i]['flight_num'] == flight_num:
+            error = "This flight already exists"
+            return render_template('login_success_staff.html', error = error)
+    else:
+        ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+        cursor.execute(ins, (airline.lower(), flight_num, departure_airport.lower(), departure_time, arrival_airport.lower(), arrival_time, price, status.lower(), airplane_id))
+        conn.commit()
+        cursor.close()
+        success = "you have successfully created a new flight"
+        return render_template('login_success_staff.html', success = success)
+
+
+
 
 
 
