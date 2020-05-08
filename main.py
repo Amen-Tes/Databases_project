@@ -116,7 +116,7 @@ def agent_search_to_get():
 @app.route('/staff_view_flights', methods=['GET', 'POST'])
 def search_staff_flight():
     cursor = conn.cursor()
-    query = 'SELECT flight_num, departure_time, departure_airport, arrival_time, arrival_airport, ticket_id FROM flight natural join ticket'
+    query = 'SELECT flight_num, departure_time, departure_airport, arrival_time, arrival_airport, status FROM flight'
     session_key = session.get('username')
     cursor.execute(query)
     data = cursor.fetchall()
@@ -128,19 +128,16 @@ def search_staff_flight():
     if data:
         for i in range(len(data)):
             var=data[count]
-            dicty[count] = "flight number {},  departs from {},  departure_time {},  arrives to {},  arrival time {},  flight number = {}, ticket_id = {}".format(count + 1,  data[count]['departure_airport'],  data[count]['departure_time'], data[count]['arrival_airport'], data[count]['arrival_time'], data[count]['flight_num'], data[count]['ticket_id'] )
+            dicty[count] = "flight number {},  departs from {},  departure_time {},  arrives to {},  arrival time {},  flight number = {}, status = {}".format(count + 1,  data[count]['departure_airport'],  data[count]['departure_time'], data[count]['arrival_airport'], data[count]['arrival_time'], data[count]['flight_num'], data[count]['status'])
             count+=1
             print('\n')
         return dicty
 
     else:
-        return "please purchase a ticket first"
+        return "there are no flights in this system, please add one first"
         return render_template("login_success_staff.html")
 
     return rows
-
-
-
 @app.route('/create_flights', methods=['GET', 'POST'])
 def create_flights():
     return render_template("airline_staff_createflights.html")
@@ -158,31 +155,107 @@ def creation():
     airplane_id = request.form['airplane_id']
     cursor = conn.cursor()
     #executes query
-    query = 'SELECT * FROM flight'
+    query = 'SELECT * FROM flight where flight_num = %s;'
     try:
-        cursor.execute(query)
+        cursor.execute(query, (flight_num))
         data = cursor.fetchall()
     except:
         error = "enter proper info"
-        return render_template('login_success_staff.html', error = error)
+        return render_template('airline_staff_createflights.html', error = error)
     #stores the results in a variable
     #use fetchall() if you are expecting more than 1 data row
     error = None
     for i in range(len(data)):
         if data[i]['flight_num'] == flight_num:
             error = "This flight already exists"
-            return render_template('login_success_staff.html', error = error)
+            return render_template('airline_staff_createflights.html', error = error)
     else:
         ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
         cursor.execute(ins, (airline.lower(), flight_num, departure_airport.lower(), departure_time, arrival_airport.lower(), arrival_time, price, status.lower(), airplane_id))
         conn.commit()
         cursor.close()
         success = "you have successfully created a new flight"
-        return render_template('login_success_staff.html', success = success)
+        return render_template('airline_staff_createflights.html', success = success)
 
+@app.route('/change_flight_status', methods=['GET', 'POST'])
+def change():
+    return render_template("change_status.html")
+@app.route('/changestatus', methods=['GET', 'POST'])
+def change_status():
+    flight_num = request.form['flight_num']
+    status = request.form['status']
+    cursor = conn.cursor()
+    query = 'SELECT flight_num FROM flight where flight_num = %s'
+    cursor.execute(query, (flight_num))
+    data = cursor.fetchone()
+    if data:
+        query2 = 'UPDATE flight SET status = %s WHERE flight_num = %s'
+        cursor.execute(query2, (status, flight_num))
+        conn.commit()
+        cursor.close()
+        success = "you have successfully updated a flight status"
+        return render_template('change_status.html', success = success)
+    else:
+        error = "enter proper info"
+        return render_template('login_success_staff.html', error = error)
+@app.route('/add_airplane', methods=['GET', 'POST'])
+def addairplane():
+    return render_template("addairplane.html")
+@app.route('/addairplane', methods=['GET', 'POST'])
+def create_airplane():
+    airline = request.form['airline_name']
+    airplane_id = request.form['airplane_id']
+    seats = request.form['number_of_seats']
+    cursor = conn.cursor()
+    #executes query
+    try:
+        query = 'SELECT * FROM airplane where airline_name = %s;'
+        cursor.execute(query, (airline.lower()))
+        data = cursor.fetchall()
+    except:
+        error = "enter proper info"
+        return render_template('addairplane.html', error = error)
+    #stores the results in a variable
+    #use fetchall() if you are expecting more than 1 data row
+    error = None
+    for i in range(len(data)):
+        if data[i]['airplane_id'] == airplane_id:
+            error = "This airplane already exists"
+            return render_template('addairplane.html', error = error)
+    else:
+        ins = 'INSERT INTO airplane VALUES(%s, %s, %s)'
+        cursor.execute(ins, (airline.lower(), airplane_id, seats))
+        conn.commit()
+        cursor.close()
+        success = "you have successfully created a new airplane"
+        return render_template('addairplane.html', success = success)
 
-
-
+@app.route('/add_airport', methods=['GET', 'POST'])
+def addairport():
+    return render_template("addairport.html")
+@app.route('/addairport', methods=['GET', 'POST'])
+def create_airport():
+    airport = request.form['airport_name']
+    airport_city = request.form['airport_city']
+    cursor = conn.cursor()
+    #executes query
+    query = 'SELECT * FROM airport;'
+    cursor.execute(query)
+    data = cursor.fetchall()
+    #stores the results in a variable
+    #use fetchall() if you are expecting more than 1 data row
+    error = None
+    for i in range(len(data)):
+        if data[i]['airport_name'] == airport:
+            error = "This airport already exists"
+            return render_template('addairport.html', error = error)
+    else:
+        ins = 'INSERT INTO airport VALUES(%s, %s)'
+        cursor.execute(ins, (airport.lower(), airport_city))
+        conn.commit()
+        cursor.close()
+        success = "you have successfully added a new airport"
+        return render_template('addairport.html', success = success)
 
 
 

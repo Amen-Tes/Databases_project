@@ -14,6 +14,9 @@
   <input type="number" name = "airplane_id" placeholder="Ariplane id" required/> </br>
   <input type="submit" value = register />
 </form>
-<a href="/">Go back</a>
+{% if success %}
+  <p class="success!"><h3>success, </h3> <h2>{{success}}</h2></p>
+{% endif %}
+<a href="/login_success_staff">Go back</a>
 </body>
 </html>

@@ -1,0 +1,15 @@
+<html>
+<head>
+</head>
+<body>
+<form action="/changestatus" method="POST">
+  <input type="number" name = "flight_num" placeholder="Flight number" required/> </br>
+  <input type="text" name = "status" placeholder="status change to" required/> </br>
+  <input type="submit" value = enter />
+</form>
+{% if success %}
+  <p class="success!"><h3>success, </h3> <h2>{{success}}</h2></p>
+{% endif %}
+<a href="/login_success_staff">Go back</a>
+</body>
+</html>

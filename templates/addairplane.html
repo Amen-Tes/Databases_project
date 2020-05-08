@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+<body>
+<form action="/addairplane" method="POST">
+  <input type="text" name = "airline_name" placeholder="Airline name" required/> </br>
+  <input type="number" name = "airplane_id" placeholder="Ariplane id" required/> </br>
+  <input type="number" name = "number_of_seats" placeholder="Number of seats" required/> </br>
+  <input type="submit" value = register />
+</form>
+{% if success %}
+  <p class="success!"><h3>success, </h3> <h2>{{success}}</h2></p>
+{% endif %}
+{% if error %}
+  <p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+{% endif %}
+<a href="/login_success_staff">Go back</a>
+</body>
+</html>
