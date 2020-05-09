@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+<body>
+  {% if customer %}
+    <h3>the most frequent customer is, </h3> <h2>{{customer}}</h2></p>
+  {% endif %}
+<form action="/viewhist" method="POST">
+  <input type="submit" value = "view his/her flight history" />
+</form>
+{% if success %}
+  <p class="success!"><h3>success, </h3> <h2>{{success}}</h2></p>
+{% endif %}
+{% if error %}
+  <p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+{% endif %}
+<a href="/login_success_staff">Go back</a>
+</body>
+</html>

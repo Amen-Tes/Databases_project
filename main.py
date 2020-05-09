@@ -257,13 +257,51 @@ def create_airport():
         success = "you have successfully added a new airport"
         return render_template('addairport.html', success = success)
 
+@app.route('/staff_view_customers', methods=['GET', 'POST'])
+def viewcust():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    #executes query
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+
+    query2 = 'SELECT customer_email, COUNT(*) as c FROM purchases natural join ticket natural join flight where airline_name = %s GROUP BY customer_email ORDER BY c DESC LIMIT 1;'
+    cursor.execute(query2, (airlinename))
+    data2 = cursor.fetchone()
+    #stores the results in a variable
+    #use fetchall() if you are expecting more than 1 data row
+    f = data2['customer_email']
+    return render_template('view_customer.html', customer=f)
+
+@app.route('/viewhist', methods=['GET', 'POST'])
+def viewhist():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    #executes query
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+
+    query2 = 'SELECT customer_email, COUNT(*) as c FROM purchases natural join ticket natural join flight where airline_name = %s GROUP BY customer_email ORDER BY c DESC LIMIT 1;'
+    cursor.execute(query2, (airlinename))
+    data2 = cursor.fetchone()
+    #stores the results in a variable
+    #use fetchall() if you are expecting more than 1 data row
+    f = data2['customer_email']
+    query3 = 'SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, price, airplane_id from flight natural join ticket natural join purchases where customer_email = %s'
+    cursor.execute(query3, (f))
+    data = cursor.fetchall()
+    dicty = {}
+    for i in range(len(data)):
+        dicty[i+1] = 'Airline name: {}, Flight number: {}, Departure airport: {}, Departure time: {}, Arrival airport: {}, Arrival time: {}, Price: {}, Airplane id: {}'.format(data[i]['airline_name'], data[i]['flight_num'], data[i]['departure_airport'], data[i]['departure_time'], data[i]['arrival_airport'], data[i]['arrival_time'], data[i]['price'], data[i]['airplane_id'])
+    return dicty;
 
 
 
-
-'''*********************************************************************************************************************************'''
-
-
+'''***********'''
 #Authenticates the login
 @app.route('/loginAuth', methods=['GET', 'POST'])
 def loginAuth():
