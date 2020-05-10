@@ -4,13 +4,27 @@
 <body>
 	<h1>Login Successful!</h1>
 	<h1>Here are the options for the booking agent</h1>
-{% if not message %}
-	<a href="/agent_view_flights">View my flights</a>
-	<a href="/agent_purchase">Purchase tickets</a>
-	<a href="/search_using_info">Search for flights</a>
-	<a href="/agent_view_commission">View my commission</a>
-	<a href="/agent_view_cust">View top customers</a>
-	<a href="/Logout">Logout</a>
-{% endif %}
+	<form action="/agent_view_flights" method="GET">
+		<input type="submit" value = "view flights" />
+	</form>
+	<form action="/agent_purchase" method="GET">
+		<input type="submit" value = "purchase tickets" />
+	</form>
+	<form action="/search_using_info" method="POST">
+		<input type="submit" value = "search for flights" /></br>
+	  <input type="text" name = "airportsource" placeholder="source city/source airport" required/> </br>
+	  <input type="text" name = "airportdestination" placeholder="destination city/destination airport" required/> </br>
+		{% if error %}
+			<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+		{% endif %}
+	</form>
+	<form action="/view_my_commission" method="GET">
+		<input type="submit" value = "view my commission" />
+	</form>
+	<form action="/view top customers" method="GET">
+		<input type="submit" value = "view top customers" />
+	</form>
+<a href="/Logout">Logout</a>
+
 </body>
 </html>

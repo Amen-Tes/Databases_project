@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+   <body>
+
+      <h2>Welcome to the destination popularity portal</h2>
+      <form action="/view_dest_1yr" method="GET">
+        <input type="submit" value = "Destination popularity within the past year" />
+      </form>
+      <form action="/view_dest_3month" method="GET">
+        <input type="submit" value = "Destination popularity within the past three months" />
+      </form>
+        {% if error %}
+      		<p class="error"><strong>Error:</strong> {{error}}</p>
+      	{% endif %}
+        {% if success %}
+    			<p class="SUCCESS!!!!"><h3>success, </h3> <h2>{{success}}</h2></p>
+    		{% endif %}
+    	</form>
+
+
+   </body>
+</html>

@@ -98,7 +98,7 @@ def agent_search_to_get():
     cursor.execute(q1, (customeremail.lower(), airportsource.lower(), airportdestination.lower(), flightnumber, status))
     data1 = cursor.fetchone()
     if data1:
-        session_key = session.get('booking_agent_id')
+        session_key = session.get('email')
         q2 = 'SELECT NOW()'
         cursor.execute(q2)
         data2 = cursor.fetchone()
@@ -115,10 +115,16 @@ def agent_search_to_get():
 '''*********************************************************************************************************************************'''
 @app.route('/staff_view_flights', methods=['GET', 'POST'])
 def search_staff_flight():
-    cursor = conn.cursor()
-    query = 'SELECT flight_num, departure_time, departure_airport, arrival_time, arrival_airport, status FROM flight'
     session_key = session.get('username')
-    cursor.execute(query)
+    cursor = conn.cursor()
+    #executes query
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query = 'SELECT flight_num, departure_time, departure_airport, arrival_time, arrival_airport, status FROM flight WHERE airline_name = %s'
+    session_key = session.get('username')
+    cursor.execute(query, (airlinename))
     data = cursor.fetchall()
     error = None
     rows = []
@@ -298,6 +304,323 @@ def viewhist():
     for i in range(len(data)):
         dicty[i+1] = 'Airline name: {}, Flight number: {}, Departure airport: {}, Departure time: {}, Arrival airport: {}, Arrival time: {}, Price: {}, Airplane id: {}'.format(data[i]['airline_name'], data[i]['flight_num'], data[i]['departure_airport'], data[i]['departure_time'], data[i]['arrival_airport'], data[i]['arrival_time'], data[i]['price'], data[i]['airplane_id'])
     return dicty;
+
+@app.route('/view_dest', methods=['GET', 'POST'])
+def viewdest():
+    return render_template('viewdest.html')
+
+@app.route('/view_dest_1yr', methods=['GET', 'POST'])
+def viewdest1yr():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    #executes query
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query2 = 'SELECT airport_city, COUNT(*) as c FROM airport natural join flight natural join ticket NATURAL JOIN purchases where airline_name = %s AND purchase_date > DATE_SUB(NOW(), INTERVAL 1 YEAR) GROUP BY airport_city ORDER BY c DESC LIMIT 3;'
+    cursor.execute(query2, (airlinename))
+    data2 = cursor.fetchall()
+    dicty = {}
+    for i in range(len(data2)):
+        dicty[i] = "most popular destination number {} is {}".format(i+1, data2[i]['airport_city'])
+    return dicty
+
+@app.route('/view_dest_3month', methods=['GET', 'POST'])
+def viewdest3month():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    #executes query
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query2 = 'SELECT airport_city, COUNT(*) as c FROM airport natural join flight natural join ticket NATURAL JOIN purchases where airline_name = %s AND purchase_date > DATE_SUB(NOW(), INTERVAL 3 MONTH) GROUP BY airport_city ORDER BY c DESC LIMIT 3;'
+    cursor.execute(query2, (airlinename))
+    data2 = cursor.fetchall()
+    dicty = {}
+    for i in range(len(data2)):
+        dicty[i] = "most popular destination number {} is {}".format(i+1, data2[i]['airport_city'])
+    return dicty
+
+@app.route('/revenue_comparison', methods = ['GET', 'POST'])
+def revenue_c():
+    return render_template("revenue_choice.html")
+
+@app.route('/one_year', methods = ['GET', 'POST'])
+def monthly():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query = 'SELECT MONTH(purchase_date) AS month, price FROM flight NATURAL JOIN ticket NATURAL JOIN purchases WHERE MONTH(purchase_date) = %s AND airline_name = %s AND purchase_date > DATE_SUB(NOW(), INTERVAL 3 MONTH);'
+    my_values = []
+    for i in range(1, 12):
+        temp = []
+        cursor.execute(query, (i, airlinename))
+        data = cursor.fetchall()
+        if (data):
+            for k in range(len(data)):
+                temp.append(data[k]['price'])
+        my_values.append(sum(temp))
+        del temp[:]
+
+
+        """ bar chart code source - https://blog.ruanbekker.com/blog/2017/12/14/graphing-pretty-charts-with-python-flask-and-chartjs/"""
+
+    labels = [
+    'JAN', 'FEB', 'MAR', 'APR',
+    'MAY', 'JUN', 'JUL', 'AUG',
+    'SEP', 'OCT', 'NOV', 'DEC']
+
+    values = my_values
+
+    colors = [
+    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+    pie_labels=labels
+    pie_values=values
+    return render_template('report_piechart.html', title='Revenue earned within the past year', max=17000, set=zip(values, labels, colors))
+
+@app.route('/month_bar', methods = ['GET', 'POST'])
+def yearly():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query = 'SELECT MONTH(purchase_date) AS month, price FROM flight NATURAL JOIN ticket NATURAL JOIN purchases WHERE MONTH(purchase_date) = %s AND airline_name = %s AND purchase_date > DATE_SUB(NOW(), INTERVAL 1 MONTH);'
+    my_values = []
+    for i in range(1, 12):
+        temp = []
+        cursor.execute(query, (i, airlinename))
+        data = cursor.fetchall()
+        if (data):
+            for k in range(len(data)):
+                temp.append(data[k]['price'])
+        my_values.append(sum(temp))
+        del temp[:]
+
+
+        """ bar chart code source - https://blog.ruanbekker.com/blog/2017/12/14/graphing-pretty-charts-with-python-flask-and-chartjs/"""
+
+    labels = [
+    'JAN', 'FEB', 'MAR', 'APR',
+    'MAY', 'JUN', 'JUL', 'AUG',
+    'SEP', 'OCT', 'NOV', 'DEC']
+
+    values = my_values
+
+    colors = [
+    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+    pie_labels=labels
+    pie_values=values
+    return render_template('report_piechart.html', title='Revenue earned within the past year', max=17000, set=zip(values, labels, colors))
+
+@app.route('/staff_view_reports', methods = ['GET', 'POST'])
+def viewreptyp():
+    return render_template('reporttyp.html')
+@app.route('/yearonly', methods = ['GET', 'POST'])
+def soldtickets():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query = 'SELECT count(*) AS c FROM purchases NATURAL JOIN ticket NATURAL JOIN flight WHERE MONTH(purchase_date) = %s AND purchase_date > DATE_SUB(NOW(), INTERVAL 1 YEAR) AND airline_name = %s GROUP BY customer_email ORDER BY c;'
+    my_values = []
+    for i in range(1, 12):
+        cursor.execute(query, (i, airlinename))
+        data = cursor.fetchall()
+        if (data):
+            for k in range(len(data)):
+                my_values.append(data[k]['c'])
+        else:
+            my_values.append(0)
+
+
+        """ bar chart code source - https://blog.ruanbekker.com/blog/2017/12/14/graphing-pretty-charts-with-python-flask-and-chartjs/"""
+
+    labels = [
+    'JAN', 'FEB', 'MAR', 'APR',
+    'MAY', 'JUN', 'JUL', 'AUG',
+    'SEP', 'OCT', 'NOV', 'DEC']
+
+    values = my_values
+
+    colors = [
+    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+    bar_labels=labels
+    bar_values=values
+    return render_template('bar_chart.html', title='tickets sold within the past year', max=5, labels=bar_labels, values=bar_values)
+
+@app.route('/monthie', methods = ['GET', 'POST'])
+def monthie():
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query = 'SELECT count(*) AS c FROM purchases NATURAL JOIN ticket NATURAL JOIN flight WHERE MONTH(purchase_date) = %s AND purchase_date > DATE_SUB(NOW(), INTERVAL 6 MONTH) AND airline_name = %s GROUP BY customer_email ORDER BY c;'
+    my_values = []
+    q2 = 'SELECT MONTH(NOW()) AS now'
+    cursor.execute(q2)
+    data2 = cursor.fetchone()
+    for i in range(1, 12):
+        cursor.execute(query, (i, airlinename))
+        data = cursor.fetchall()
+        if (data):
+            for k in range(len(data)):
+                my_values.append(data[k]['c'])
+        else:
+            my_values.append(0)
+
+    """ bar chart code source - https://blog.ruanbekker.com/blog/2017/12/14/graphing-pretty-charts-with-python-flask-and-chartjs/"""
+    labels = []
+    values = []
+    if data2['now'] == 1:
+        labels.extend(['AUG','SEP', 'OCT', 'NOV', 'DEC', 'JAN'])
+        values.extend(my_values[6:12])
+        values.append(my_values[0])
+    elif data2['now'] == 2:
+        labels.extend(['SEP','OCT', 'NOV', 'DEC', 'JAN', 'FEB'])
+        values.extend(my_values[8:12])
+        values.append(my_values[0])
+        values.append(my_values[1])
+    elif data2['now'] == 3:
+        labels.extend(['OCT','NOV', 'DEC', 'JAN', 'FEB', 'MAR'])
+        values.extend(my_values[9:12])
+        values.append(my_values[0])
+        values.append(my_values[1])
+        values.append(my_values[2])
+    elif data2['now'] == 4:
+        labels.extend(['NOV','DEC', 'JAN', 'FEB', 'MAR', 'APR'])
+        values.append(my_values[10])
+        values.append(my_values[11])
+        values.append(my_values[0])
+        values.append(my_values[1])
+        values.append(my_values[2])
+        values.append(my_values[3])
+    elif data2['now'] == 5:
+        labels.extend(['DEC','JAN', 'FEB', 'MAR', 'APR', 'MAY'])
+        values.append(my_values[11])
+        values.extend(my_values[0:6])
+    elif data2['now'] == 6:
+        labels.extend(['JAN','FEB', 'MAR', 'APR', 'MAY', 'JUNE'])
+        values.extend(my_values[0:7])
+    elif data2['now'] == 7:
+        labels.extend(['FEB','MAR', 'APR', 'MAY', 'JUN', 'JUL'])
+        values.extend(my_values[1:8])
+    elif data2['now'] == 8:
+        labels.extend(['MAR','APR', 'MAY', 'JUNE', 'JUL', 'AUG'])
+        values.extend(my_values[2:9])
+    elif data2(['now']) == 9:
+        labels.extend(['APR','MAY', 'JUN', 'JUL', 'AUG', 'SEP'])
+        values.extend(my_values[3:10])
+    elif data2['now'] == 10:
+        labels.extend(['MAY','JUN', 'JUL', 'AUG', 'SEP', 'OCT'])
+        values.extend(my_values[4:11])
+    elif data2['now'] == 11:
+        labels.extend(['JUN','JUL', 'AUG', 'SEP', 'AUG', 'NOV'])
+        values.extend(my_values[5:12])
+    elif data2['now'] == 12:
+        labels.extend(['JUL','AUG', 'SEP', 'OCT', 'NOV', 'DEC'])
+        values.extend(my_values[6:13])
+
+
+    colors = [
+    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+    bar_labels=labels
+    bar_values=values
+    return render_template('bar_chart.html', title='Expenditure within the past 6 months', max=10, labels=bar_labels, values=bar_values)
+
+@app.route('/specifica', methods = ['GET', 'POST'])
+def specifica():
+    cursor = conn.cursor()
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    fromm = request.form['from']
+    to = request.form['to']
+    frommonth = int(fromm)
+    tomonth = int(to)
+    if frommonth<1 or frommonth>12 or tomonth<1 or tomonth>12:
+        error = "please enter valid values"
+        return render_template('login_success_customer.html', error = error)
+    else:
+        query = 'SELECT count(*) AS c FROM purchases NATURAL JOIN ticket NATURAL JOIN flight WHERE MONTH(purchase_date) = %s AND purchase_date > DATE_SUB(NOW(), INTERVAL 6 MONTH) AND airline_name = %s GROUP BY customer_email ORDER BY c;'
+        my_values = []
+        q2 = 'SELECT MONTH(NOW()) AS now'
+        cursor.execute(q2)
+        data2 = cursor.fetchone()
+        if frommonth>tomonth:
+            for i in range(frommonth, 13):
+                cursor.execute(query, (i, airlinename))
+                data = cursor.fetchall()
+                if (data):
+                    for k in range(len(data)):
+                        my_values.append(data[k]['c'])
+                else:
+                    my_values.append(0)
+            for i in range(1, tomonth+1):
+                cursor.execute(query, (i, airlinename))
+                data = cursor.fetchall()
+                if (data):
+                    for k in range(len(data)):
+                        my_values.append(data[k]['c'])
+                else:
+                    my_values.append(0)
+
+        else:
+            for i in range(frommonth, tomonth+1):
+                cursor.execute(query, (i, airlinename))
+                data = cursor.fetchall()
+                if (data):
+                    for k in range(len(data)):
+                        my_values.append(data[k]['c'])
+                else:
+                    my_values.append(0)
+        """ bar chart code source - https://blog.ruanbekker.com/blog/2017/12/14/graphing-pretty-charts-with-python-flask-and-chartjs/"""
+        labels = []
+        if frommonth<tomonth:
+            for i in range(frommonth,(tomonth)+1):
+                labels.append("month {}".format(i))
+        elif tomonth<frommonth:
+            for i in range(tomonth, 13):
+                labels.append("month {}".format(i))
+            for i in range(1,frommonth+1):
+                labels.append("month {}".format(i))
+
+        values = my_values
+
+        colors = [
+        "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+        "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+        "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+        bar_labels=labels
+        bar_values=values
+        return render_template('bar_chart.html', title='Expenditure between months {} and {}'.format(fromm, to), max=10, labels=bar_labels, values=bar_values)
+
 
 
 
@@ -625,52 +948,53 @@ def month_chart():
     labels = []
     values = []
     if data2['now'] == 1:
-        labels.extend(['SEP', 'OCT', 'NOV', 'DEC', 'JAN'])
-        values.extend(my_values[8:12])
+        labels.extend(['AUG','SEP', 'OCT', 'NOV', 'DEC', 'JAN'])
+        values.extend(my_values[6:12])
         values.append(my_values[0])
     elif data2['now'] == 2:
-        labels.extend(['OCT', 'NOV', 'DEC', 'JAN', 'FEB'])
-        values.extend(my_values[9:12])
+        labels.extend(['SEP','OCT', 'NOV', 'DEC', 'JAN', 'FEB'])
+        values.extend(my_values[8:12])
         values.append(my_values[0])
         values.append(my_values[1])
     elif data2['now'] == 3:
-        labels.extend(['NOV', 'DEC', 'JAN', 'FEB', 'MAR'])
-        values.extend(my_values[10:12])
+        labels.extend(['OCT','NOV', 'DEC', 'JAN', 'FEB', 'MAR'])
+        values.extend(my_values[9:12])
         values.append(my_values[0])
         values.append(my_values[1])
         values.append(my_values[2])
     elif data2['now'] == 4:
-        labels.extend(['DEC', 'JAN', 'FEB', 'MAR', 'APR'])
-        values.extend(my_values[11])
+        labels.extend(['NOV','DEC', 'JAN', 'FEB', 'MAR', 'APR'])
+        values.append(my_values[10])
+        values.append(my_values[11])
         values.append(my_values[0])
         values.append(my_values[1])
         values.append(my_values[2])
         values.append(my_values[3])
     elif data2['now'] == 5:
-        labels.extend(['JAN', 'FEB', 'MAR', 'APR', 'MAY'])
+        labels.extend(['DEC','JAN', 'FEB', 'MAR', 'APR', 'MAY'])
+        values.append(my_values[11])
         values.extend(my_values[0:6])
     elif data2['now'] == 6:
-        labels.extend(['FEB', 'MAR', 'APR', 'MAY', 'JUNE'])
-        values.extend(my_values[1:7])
+        labels.extend(['JAN','FEB', 'MAR', 'APR', 'MAY', 'JUNE'])
+        values.extend(my_values[0:7])
     elif data2['now'] == 7:
-        labels.extend(['MAR', 'APR', 'MAY', 'JUN', 'JUL'])
-        values.extend(my_values[2:8])
+        labels.extend(['FEB','MAR', 'APR', 'MAY', 'JUN', 'JUL'])
+        values.extend(my_values[1:8])
     elif data2['now'] == 8:
-        labels.extend(['APR', 'MAY', 'JUNE', 'JUL', 'AUG'])
-        values.extend(my_values[3:9])
+        labels.extend(['MAR','APR', 'MAY', 'JUNE', 'JUL', 'AUG'])
+        values.extend(my_values[2:9])
     elif data2(['now']) == 9:
-        labels.extend(['MAY', 'JUN', 'JUL', 'AUG', 'SEP'])
-        values.extend(my_values[4:10])
+        labels.extend(['APR','MAY', 'JUN', 'JUL', 'AUG', 'SEP'])
+        values.extend(my_values[3:10])
     elif data2['now'] == 10:
-        labels.extend(['JUN', 'JUL', 'AUG', 'SEP', 'OCT'])
-        values.extend(my_values[5:11])
+        labels.extend(['MAY','JUN', 'JUL', 'AUG', 'SEP', 'OCT'])
+        values.extend(my_values[4:11])
     elif data2['now'] == 11:
-        labels.extend(['JUL', 'AUG', 'SEP', 'AUG', 'NOV'])
-        values.extend(my_values[6:12])
+        labels.extend(['JUN','JUL', 'AUG', 'SEP', 'AUG', 'NOV'])
+        values.extend(my_values[5:12])
     elif data2['now'] == 12:
-        labels.extend(['AUG', 'SEP', 'OCT', 'NOV', 'DEC'])
-        values.extend(my_values[7:13])
-
+        labels.extend(['JUL','AUG', 'SEP', 'OCT', 'NOV', 'DEC'])
+        values.extend(my_values[6:13])
 
     colors = [
     "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
