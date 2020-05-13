@@ -1,0 +1,26 @@
+<html>
+<head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
+</head>
+<body>
+	<form action="/ticket_six_bar" method="GET">
+		<input type="submit" value = "top 5 customers based on number of tickets bought within the last 6 months" />
+	</form>
+	<form action="/commission_yr_bar" method="GET">
+		<input type="submit" value = "top 5 customers based on amount of commission I received" />
+	</form>
+	{% if error %}
+		<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+	{% endif %}
+<a href="/login_success_staff">back</a>
+
+</body>
+</html>

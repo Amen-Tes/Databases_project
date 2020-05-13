@@ -67,7 +67,7 @@ def search_agent_flight():
     dicty={}
     if data:
         for i in range(len(data)):
-            dicty[i] = (data[i]['flight_num'], data[i]['departure_airport'], data[i]['departure_time'], data[i]['arrival_time'], data[i]['flight_num'], data[i]['ticket_id'], data[i]['customer_email'])
+            dicty[i] = (data[i]['flight_num'], data[i]['departure_airport'], data[i]['departure_time'], data[i]['arrival_airport'], data[i]['arrival_time'], data[i]['ticket_id'], data[i]['customer_email'])
     else:
         return "please purchase a ticket first"
         return render_template("login_success_agent.html")
@@ -207,35 +207,64 @@ def avgcommission():
         table.append(temp)
     return render_template('printer.html', table = table, header = headers)
 
-
-
-@app.route('/agent_view_cust')
+@app.route('/view_top_customers', methods = ['GET', 'POST'])
 def agent_view_cust():
-    session_key = session.get('email')
-    if session_key == "Booking@agent.com":
-        keykey = 1
-    else:
-        keykey = 2
-    cursor = conn.cursor()
-    #executes query
-    query = 'SELECT customer_email, COUNT(*) as c FROM flight NATURAL JOIN booking_agent NATURAL JOIN purchases NATURAL JOIN ticket WHERE booking_agent_id = %s AND flight.flight_num = ticket.flight_num AND ticket.ticket_id = purchases.ticket_id GROUP BY customer_email ORDER BY c DESC LIMIT 5;'
-    cursor.execute(query, (keykey))
-    data = cursor.fetchone()
-    example = data["customer_email"]
-    diction = {}
-    for i in range(1):
-        diction[i] = "Best customer based on the number of tickets is {}".format(example)
-        print('\n')
+    return render_template('number_ticket_yr_or_mth.html')
 
-    query1 = 'SELECT SUM(price), COUNT(booking_agent_id) AS tics_sold, MAX(price) as calc FROM flight NATURAL JOIN booking_agent NATURAL JOIN purchases NATURAL JOIN ticket WHERE booking_agent_id = %s AND flight.flight_num = ticket.flight_num AND ticket.ticket_id = purchases.ticket_id'
-    cursor.execute(query1, (keykey))
-    data1 = cursor.fetchone()
-    commission = (float(data1['SUM(price)']))*0.1
-    max_comm = (float(data1["calc"]))*0.1
-    dicti = {}
-    for i in range(1):
-        dicti[i] = "Highest commission is {:.2f}".format(max_comm)
-    return '{}{}'.format(diction, dicti)
+
+""" bar chart code source - https://blog.ruanbekker.com/blog/2017/12/14/graphing-pretty-charts-with-python-flask-and-chartjs/"""
+@app.route('/ticket_six_bar', methods = ['GET', 'POST'])
+def in_six_mth():
+    session_key = session.get('email')
+    cursor = conn.cursor()
+    q3 = 'SELECT booking_agent_id FROM booking_agent WHERE email = %s'
+    cursor.execute(q3, (session_key))
+    data3 = cursor.fetchone()
+    agents_id = data3['booking_agent_id']
+    query = 'SELECT customer_email, count(*) AS c FROM purchases NATURAL JOIN ticket NATURAL JOIN flight WHERE purchase_date > DATE_SUB(NOW(), INTERVAL 6 MONTH) AND booking_agent_id = %s AND booking_agent_id IS NOT NULL GROUP BY customer_email ORDER BY c DESC LIMIT 5;'
+    my_values = []
+    labels = []
+    cursor.execute(query, (agents_id))
+    data = cursor.fetchall()
+    values = []
+    for i in range(len(data)):
+        labels.append(data[i]['customer_email'])
+        values.append(data[i]['c'])
+
+
+    colors = [
+    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+    return render_template('bar_chart.html', title='Tickets these outstanding customers bought within the past six months', max=20, values=values, labels = labels)
+
+
+@app.route('/commission_yr_bar', methods = ['GET', 'POST'])
+def IN1YR():
+    session_key = session.get('email')
+    cursor = conn.cursor()
+    q3 = 'SELECT booking_agent_id FROM booking_agent WHERE email = %s'
+    cursor.execute(q3, (session_key))
+    data3 = cursor.fetchone()
+    agents_id = data3['booking_agent_id']
+    query = 'SELECT customer_email, SUM(price*0.1) AS c FROM purchases NATURAL JOIN ticket NATURAL JOIN flight WHERE purchase_date > DATE_SUB(NOW(), INTERVAL 1 YEAR) AND booking_agent_id = %s AND booking_agent_id IS NOT NULL GROUP BY customer_email ORDER BY c DESC LIMIT 5;'
+    my_values = []
+    labels = []
+    cursor.execute(query, (agents_id))
+    data = cursor.fetchall()
+    values = []
+    for i in range(len(data)):
+        labels.append(data[i]['customer_email'])
+        values.append(data[i]['c'])
+
+
+    colors = [
+    "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+    "#ABCDEF", "#DDDDDD", "#ABCABC", "#4169E1",
+    "#C71585", "#FF4500", "#FEDCBA", "#46BFBD"]
+
+    return render_template('bar_chart.html', title='amount of commission from outstanding customers within the past year', max=2000, values=values, labels = labels)
 
 
 '''*********************************************************************************************************************************'''
@@ -716,7 +745,7 @@ def ticketyr():
         error = "no data"
         return render_template('login_success_customer.html', error = error)
 
-    headers = ['agent id', 'tickets sold']
+    headers = ['agent id', 'tickets sold last year']
     table = []
     for key, value in dicty.iteritems():
         temp = []
@@ -745,7 +774,7 @@ def ticketMTH():
         error = "no data"
         return render_template('login_success_customer.html', error = error)
 
-    headers = ['agent id', 'tickets sold']
+    headers = ['agent id', 'tickets sold last month']
     table = []
     for key, value in dicty.iteritems():
         temp = []
@@ -754,6 +783,63 @@ def ticketMTH():
         table.append(temp)
     return render_template('printer.html', table = table, header = headers)
 
+@app.route('/commission_earned_yr', methods = ['GET', 'POST'])
+def commissionyr():
+    cursor = conn.cursor()
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query = 'SELECT booking_agent_id, SUM(price*0.1) AS s FROM purchases NATURAL JOIN ticket NATURAL JOIN flight WHERE purchase_date > DATE_SUB(NOW(), INTERVAL 1 YEAR) AND airline_name = %s AND booking_agent_id IS NOT NULL GROUP BY booking_agent_id ORDER BY s DESC LIMIT 5;'
+    cursor.execute(query, (airlinename))
+    data2 = cursor.fetchall()
+    dicty={}
+    if(data2):
+        for i in range(len(data2)):
+            dicty[i] = (data2[i]['booking_agent_id'], data2[i]['s'])
+    else:
+        error = "no data"
+        return render_template('login_success_customer.html', error = error)
+
+    headers = ['agent id', 'commission earned past year']
+    table = []
+    for key, value in dicty.iteritems():
+        temp = []
+        for i in value:
+            temp.extend([i])
+        table.append(temp)
+    return render_template('printer.html', table = table, header = headers)
+
+@app.route('/commission_earned_month', methods = ['GET', 'POST'])
+def commissionmth():
+    cursor = conn.cursor()
+    session_key = session.get('username')
+    cursor = conn.cursor()
+    query1 = 'SELECT distinct(airline_name) FROM airline_staff WHERE username = %s;'
+    cursor.execute(query1, (session_key.lower()))
+    data = cursor.fetchone()
+    airlinename = data['airline_name']
+    query = 'SELECT booking_agent_id, SUM(price*0.1) AS s FROM purchases NATURAL JOIN ticket NATURAL JOIN flight WHERE purchase_date > DATE_SUB(NOW(), INTERVAL 1 MONTH) AND airline_name = %s AND booking_agent_id IS NOT NULL GROUP BY booking_agent_id ORDER BY s DESC LIMIT 5;'
+    cursor.execute(query, (airlinename))
+    data2 = cursor.fetchall()
+    dicty={}
+    if(data2):
+        for i in range(len(data2)):
+            dicty[i] = (data2[i]['booking_agent_id'], data2[i]['s'])
+    else:
+        error = "no data"
+        return render_template('login_success_customer.html', error = error)
+
+    headers = ['agent id', 'commission earned past month']
+    table = []
+    for key, value in dicty.iteritems():
+        temp = []
+        for i in value:
+            temp.extend([i])
+        table.append(temp)
+    return render_template('printer.html', table = table, header = headers)
 
 
 

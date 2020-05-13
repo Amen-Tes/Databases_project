@@ -14,10 +14,10 @@
 	<h1>Login Successful!</h1>
 	<h1>Here are the options for the booking agent</h1>
 	<form action="/agent_view_flights" method="GET">
-		<input type="submit" value = "view flights" />
+		<input type="submit" value = "view flights I purchased for customers" />
 	</form>
 	<form action="/agent_purchase" method="GET">
-		<input type="submit" value = "purchase tickets" />
+		<input type="submit" value = "purchase tickets for customers" />
 	</form>
 	<form action="/searchit" method="POST">
 	  <input type="text" name = "airportsource" placeholder="source city/source airport" required/> </br>
@@ -33,7 +33,7 @@
   <form action="/view_my_average_commission" method="GET">
 		<input type="submit" value = "view average commission within the past month" />
 	</form>
-	<form action="/view top customers" method="GET">
+	<form action="/view_top_customers" method="GET">
 		<input type="submit" value = "view top customers" />
 	</form>
 <a href="/Logout">Logout</a>
