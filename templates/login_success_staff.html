@@ -1,5 +1,14 @@
 <html>
 <head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
 </head>
 <body>
 	<h1>Login Successful!</h1>
@@ -25,11 +34,11 @@
 	<form action="/staff_view_customers" method="GET">
 		<input type="submit" value = "view frequent customers" />
 	</form>
-	<form action="/staff_view_reports" method="GET">
-		<input type="submit" value = "view reports" />
+	<form action="/view_reports" method="GET">
+		<input type="submit" value = "view barcharts of number of tickets sold " />
 	</form>
-	<form action="/revenue_comparison" method="GET">
-		<input type="submit" value = "compare revenues" />
+  <form action="/compare_revenue_earned" method="GET">
+		<input type="submit" value = "view piecharts of report of revenue earned" />
 	</form>
 	<form action="/view_dest" method="GET">
 		<input type="submit" value = "view top destinations" />

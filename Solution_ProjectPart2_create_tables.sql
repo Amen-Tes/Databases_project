@@ -1,4 +1,3 @@
-use databases_project_part3;
 CREATE TABLE `airline` (
   `airline_name` varchar(50) NOT NULL,
   PRIMARY KEY(`airline_name`)
@@ -9,16 +8,6 @@ CREATE TABLE `airline` (
 --
 -- Table structure for table `airline_staff`
 --
-select * from flight;
-SELECT * FROM ticket;
-select * from purchases;
-
-delete from purchases
-where customer_email = 'atd341@nyu.edu';
-
-
-
-
 
 CREATE TABLE `airline_staff` (
   `username` varchar(50) NOT NULL,
@@ -32,12 +21,11 @@ CREATE TABLE `airline_staff` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
-select * from airline_staff;
+
 --
 -- Table structure for table `airplane`
 --
 
-s
 CREATE TABLE `airplane` (
   `airline_name` varchar(50) NOT NULL,
   `airplane_id` int(11) NOT NULL,
@@ -63,7 +51,6 @@ CREATE TABLE `airport` (
 --
 -- Table structure for table `booking_agent`
 --
-select * from flight;
 
 CREATE TABLE `booking_agent` (
   `email` varchar(50) NOT NULL,

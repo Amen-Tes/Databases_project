@@ -1,0 +1,34 @@
+<html>
+<head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
+</head>
+<body>
+	<form action="/yearonly" method="GET">
+		<input type="submit" value = "View bar chart of number of tickets sold within the past year" />
+	</form>
+	<form action="/monthie" method="GET">
+		<input type="submit" value = "View bar chart of revenue earned within the past 6 months" />
+	</form>
+  <form action="/specifica" method="POST">
+	  <input type="number" name = "from" placeholder=" from month (number please)" required/> </br>
+	  <input type="number" name = "to" placeholder="to month (number)" required/> </br>
+    <input type="submit" value = "enter" /></br>
+		{% if error %}
+			<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+		{% endif %}
+	</form>
+	{% if error %}
+		<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+	{% endif %}
+<a href="/login_success_staff">back</a>
+
+</body>
+</html>

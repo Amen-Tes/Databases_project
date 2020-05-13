@@ -1,5 +1,14 @@
 <html>
 <head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
 </head>
 <body>
 	<h1>Login Successful!</h1>
@@ -10,16 +19,19 @@
 	<form action="/agent_purchase" method="GET">
 		<input type="submit" value = "purchase tickets" />
 	</form>
-	<form action="/search_using_info" method="POST">
-		<input type="submit" value = "search for flights" /></br>
+	<form action="/searchit" method="POST">
 	  <input type="text" name = "airportsource" placeholder="source city/source airport" required/> </br>
 	  <input type="text" name = "airportdestination" placeholder="destination city/destination airport" required/> </br>
+		<input type="submit" value = "search for flights" /></br>
 		{% if error %}
 			<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
 		{% endif %}
+	</form></br>
+	<form action="/view_my_total_commission" method="GET">
+		<input type="submit" value = "view total commission within the past month" />
 	</form>
-	<form action="/view_my_commission" method="GET">
-		<input type="submit" value = "view my commission" />
+  <form action="/view_my_average_commission" method="GET">
+		<input type="submit" value = "view average commission within the past month" />
 	</form>
 	<form action="/view top customers" method="GET">
 		<input type="submit" value = "view top customers" />

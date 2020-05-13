@@ -1,0 +1,26 @@
+<html>
+<head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
+</head>
+<body>
+	<form action="/one_year" method="GET">
+		<input type="submit" value = "View pie chart of revenue earned within the past year" />
+	</form>
+	<form action="/month_bar" method="GET">
+		<input type="submit" value = "View pie chart of expenditure within the last month" />
+	</form>
+	{% if error %}
+		<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+	{% endif %}
+<a href="/login_success_staff">back</a>
+
+</body>
+</html>

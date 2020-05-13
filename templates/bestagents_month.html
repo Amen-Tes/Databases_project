@@ -1,0 +1,26 @@
+<html>
+<head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
+</head>
+<body>
+	<form action="/tickets_sold_month" method="GET">
+		<input type="submit" value = "view top booking agents from the past month based on number of tickets sold" />
+	</form>
+	<form action="/commission_earned_month" method="GET">
+		<input type="submit" value = "view top booking agents from the past month based on amount of commission earned" />
+	</form>
+	{% if error %}
+		<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+	{% endif %}
+<a href="/login_success_staff">back</a>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+<html>
+<head>
+  <style>
+      body {
+        background-color: #FFFF00;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
+</head>
+  <table border = 8>
+  {% for i in header %}
+    <th> {{i}} </th>
+  {% endfor %}
+  {% for t in table %}
+      <tr>
+      {% for i in t %}
+          <td>{{ i }}</td>
+      {% endfor %}
+      </tr>
+  {% endfor %}
+  </table>
+</html>

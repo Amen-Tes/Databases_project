@@ -2,14 +2,28 @@
 <html>
 
 <head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
 
 </head>
 
 <body>
 {% if not message %}
-	<a href="/login">Login</a>
-	<a href="/register">Register</a>
-	<a href="/search">search</a>
+<form action="/login" method="GET">
+  <input type="submit" value = login />
+</form>
+<form action="/register" method="GET">
+  <input type="submit" value = register />
+</form>
+<form action="/search" method="GET">
+  <input type="submit" value = search />
+</form>
 {% endif %}
 
 {% if message %}

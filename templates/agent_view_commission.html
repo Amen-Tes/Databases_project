@@ -1,0 +1,28 @@
+<html>
+<head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
+</head>
+<body>
+	<form action="/agent_view_commission" method="GET">
+		<input type="submit" value = "view commission" />
+	</form>
+	<form action="/change_flight_status" method="GET">
+		<input type="submit" value = "change flight status" />
+	</form>
+
+
+	{% if error %}
+		<p class="error"><h3>Error, </h3> <h2>{{error}}</h2></p>
+	{% endif %}
+<a href="/Logout">Logout</a>
+
+</body>
+</html>

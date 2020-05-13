@@ -1,12 +1,22 @@
 <!doctype html>
 <html>
+<head>
+  <style>
+      body {
+        background-color: #8ebc42;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+  </style>
+
+</head>
    <body>
 
       <h2>Welcome to your ticket purchase portal.</br> search for your flight to purchase</h2>
-      <form action="/search_to_purchase" method="POST">
-        <input type="text" name = "airportsource" placeholder="source airport" required/> </br>
-        <input type="text" name = "airportdestination" placeholder="destination airport" required/> </br>
-        <input type="number" name = "flightnumber" placeholder="flight number" required/> </br>
+      <form action="/agent_search_to_purchase" method="POST">
+        <input type="number" name = "flight_number" placeholder="flight number" required/> </br>
+        <input type="text" name = "customer_email" placeholder="customer email" required/> </br>
         <input type="submit" value = enter />
         {% if error %}
       		<p class="error"><strong>Error:</strong> {{error}}</p>
@@ -15,6 +25,7 @@
     			<p class="SUCCESS!!!!"><h3>success, </h3> <h2>{{success}}</h2></p>
     		{% endif %}
     	</form>
+      <a href="/login_success_agent">Go back</a>
 
 
    </body>
