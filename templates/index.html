@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
-
+<title>
+	AirTicket
+</title>
 <head>
   <style>
       body {
@@ -10,39 +12,24 @@
         appearance: none;
       }
   </style>
-
+<center>
+	<h1>Welcome to the Air Ticket Reservation System!</h1>
+	<h2>You can start with the following actions:</h2>
+</center>
 </head>
 
 <body>
-{% if not message %}
+<center>
 <form action="/login" method="GET">
-  <input type="submit" value = login />
+  <input type="submit" value = Login />
 </form>
 <form action="/register" method="GET">
-  <input type="submit" value = register />
+  <input type="submit" value = Register />
 </form>
 <form action="/search" method="GET">
-  <input type="submit" value = search />
+  <input type="submit" value = Search />
 </form>
-{% endif %}
-
-{% if message %}
-	<a href="/logout">Logout</a>
-	<a href="/remove_account">Remove Account</a>
-	<p class="message">You are logged in {{message}}. You have {{num}} follower(s)</p> </br>
-	<a href="/tweets">View your tweets</a> </br>
-	<a href="/find_people">Find people to follow</a> </br>
-	<a href="/unfollow">Unfollow someone</a> </br>
-	<a href="/view_followed">View people you have followed</a> </br>
-	</br>
-
-        <h4>15 most recent tweets from you and your followers </h4> </br>
-
-	{% for line in tweets%}
-	        <p>{{line}}</p>
-	        <hr>
-	{% endfor %}
-	{% endif %}
+</center>
 </body>
 
 </html>
